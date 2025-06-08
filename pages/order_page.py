@@ -1,36 +1,43 @@
+# pages/order_page.py
+import allure
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+
+from .base_page import BasePage
+from locators.order_locators import OrderPageLocators
 
 
-class OrderPage:
-    def __init__(self, driver):
-        self.driver = driver
+class OrderPage(BasePage):
+    @allure.step("Заполнить первую страницу формы заказа")
+    def fill_first_page(self, name, last_name, address, metro_station, phone):
+        self.input_text(OrderPageLocators.NAME_INPUT, name)
+        self.input_text(OrderPageLocators.LAST_NAME_INPUT, last_name)
+        self.input_text(OrderPageLocators.ADDRESS_INPUT, address)
+        self.input_text(OrderPageLocators.METRO_STATION_INPUT, metro_station)
+        self.click((OrderPageLocators.METRO_STATION_ITEM[0],
+                    OrderPageLocators.METRO_STATION_ITEM[1].format(metro_station)))
+        self.input_text(OrderPageLocators.PHONE_INPUT, phone)
+        self.click(OrderPageLocators.NEXT_BUTTON)
 
-    def fill_order_form(self, name, surname, address, metro_station, phone, date, comment):
-        # Заполнение первой части формы
-        self.driver.find_element(By.XPATH, "//input[@placeholder='* Имя']").send_keys(name)
-        self.driver.find_element(By.XPATH, "//input[@placeholder='* Фамилия']").send_keys(surname)
-        self.driver.find_element(By.XPATH, "//input[@placeholder='* Адрес: куда привезти заказ']").send_keys(address)
-        self.driver.find_element(By.XPATH, "//input[@placeholder='* Станция метро']").click()
-        self.driver.find_element(By.XPATH, f"//div[text()='{metro_station}']").click()
-        self.driver.find_element(By.XPATH, "//input[@placeholder='* Телефон: на него позвонит курьер']").send_keys(phone)
-        self.driver.find_element(By.XPATH, "//button[text()='Далее']").click()
+    @allure.step("Заполнить вторую страницу формы заказа")
+    def fill_second_page(self, date, period, color, comment):
+        self.input_text(OrderPageLocators.DATE_INPUT, date)
+        self.click(OrderPageLocators.RENTAL_PERIOD_DROPDOWN)
+        self.click(OrderPageLocators.RENTAL_PERIOD_DROPDOWN_ARROW)
 
-        # Заполнение второй части формы
-        WebDriverWait(self.driver, 3).until(EC.visibility_of_element_located((By.XPATH, "//input[@placeholder='* Когда привезти самокат']")))
-        self.driver.find_element(By.XPATH, "//input[@placeholder='* Когда привезти самокат']").send_keys(date)
-        self.driver.find_element(By.XPATH, "//div[contains(text(), 'Про аренду')]").click()
-        self.driver.find_element(By.XPATH, "//div[contains(text(), 'Срок аренды')]").click()
-        self.driver.find_element(By.XPATH, "//div[text()='сутки']").click()
-        self.driver.find_element(By.XPATH, "//input[@id='black']").click()
-        self.driver.find_element(By.XPATH, "//input[@placeholder='Комментарий для курьера']").send_keys(comment)
-        self.driver.find_element(By.XPATH, "//button[contains(text(), 'Заказать') and @class='Button_Button__ra12g Button_Middle__1CSJM']").click()
+        self.click((OrderPageLocators.RENTAL_PERIOD_OPTION[0],
+                    OrderPageLocators.RENTAL_PERIOD_OPTION[1].format(period)))
+        if color:
+            self.click((OrderPageLocators.COLOR_CHECKBOX[0],
+                        OrderPageLocators.COLOR_CHECKBOX[1].format(color)))
+        if comment:
+            self.input_text(OrderPageLocators.COMMENT_INPUT, comment)
+        self.click(OrderPageLocators.ORDER_BUTTON)
 
+    @allure.step("Подтвердить заказ")
     def confirm_order(self):
-        self.driver.find_element(By.XPATH, "//button[text()='Да']").click()
+        self.wait_for_element(OrderPageLocators.CONFIRM_MODAL)
+        self.click(OrderPageLocators.CONFIRM_BUTTON)
 
+    @allure.step("Проверить успешное создание заказа")
     def check_success_message(self):
-        return WebDriverWait(self.driver, 5).until(
-            EC.visibility_of_element_located((By.XPATH, "//div[contains(text(), 'Заказ оформлен')]"))
-        ).text
+        return self.get_text(OrderPageLocators.SUCCESS_MESSAGE)

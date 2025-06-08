@@ -1,32 +1,30 @@
-from selenium.webdriver.common.by import By
+# pages/questions_page.py
+from .base_page import BasePage
+from locators.faq_locators import QuestionsPageLocators
+import allure
 
 
-# from selenium.webdriver.support.wait import WebDriverWait
-# from selenium.webdriver.support import expected_conditions as EC
+class QuestionsPage(BasePage):
+    @allure.step("Accept cookies")
+    def accept_cookies(self):
+        if self.is_element_displayed(QuestionsPageLocators.COOKIE_BUTTON):
+            self.click(QuestionsPageLocators.COOKIE_BUTTON)
 
+    @allure.step("Клик на вопрос")
+    def click_question(self, question_index):
+        locator = (QuestionsPageLocators.QUESTION[0],
+                   QuestionsPageLocators.QUESTION[1].format(question_index))
+        self.scroll_to_element(locator)
+        self.click(locator)
 
-class FaqPage:
-    def __init__(self, driver):
-        self.driver = driver
+    @allure.step("Получить текст")
+    def get_answer_text(self, question_index):
+        locator = (QuestionsPageLocators.ANSWER[0],
+                   QuestionsPageLocators.ANSWER[1].format(question_index))
+        return self.get_text(locator)
 
-    def get_question_locator(self, index):
-        return (By.ID, f"accordion__heading-{index}")
-
-    def get_answer_locator(self, index):
-        return (By.ID, f"accordion__panel-{index}")
-
-    def get_open_question_locator(self, index):
-        return (By.ID, f"accordion__panel-{index}")
-
-    def click_question(self, index):
-        self.driver.find_element(*self.get_question_locator(index)).click()
-
-    def is_open_question(self, index):
-        self.driver.find_element(*self.get_question_locator(index)).click()
-
-    def is_answer_displayed(self, index):
-        return self.driver.find_element(*self.get_answer_locator(index)).is_displayed
-
-    def find_faq(self):
-        faq_section = self.driver.find_element(By.CSS_SELECTOR, ".Home_FAQ__3uVm4")
-        self.driver.execute_script("arguments[0].scrollIntoView();", faq_section)
+    @allure.step("Проверить ответ")
+    def is_answer_displayed(self, question_index):
+        locator = (QuestionsPageLocators.ANSWER[0],
+                   QuestionsPageLocators.ANSWER[1].format(question_index))
+        return self.is_element_displayed
