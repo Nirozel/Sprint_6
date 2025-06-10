@@ -15,13 +15,6 @@ class BasePage:
             EC.presence_of_element_located(locator)
         )
 
-    @allure.step("Поиск элемента")
-    def find_element(self, locator, timeout=10):
-        return WebDriverWait(self.driver, timeout).until(
-            EC.presence_of_element_located(locator),
-            message=f"Не удалось найти: {locator}"
-        )
-
     @allure.step("проверить кликабельность")
     def wait_for_clickable(self, locator, timeout=10):
         return WebDriverWait(self.driver, timeout).until(
@@ -52,6 +45,10 @@ class BasePage:
     @allure.step("Проверить элемент")
     def is_element_displayed(self, locator, timeout=10):
         try:
-            return self.find_element(locator, timeout).is_displayed()
+            return self.wait_for_element(locator, timeout).is_displayed()
         except:
             return False
+
+    @allure.step("Получить текущий URL")
+    def get_current_url(self):
+        return self.driver.current_url

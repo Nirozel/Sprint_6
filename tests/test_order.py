@@ -62,6 +62,15 @@ class TestOrderFlow:
         with allure.step("Проверить сообщение об успешном заказе"):
             assert "Заказ оформлен" in order_page.check_success_message()
 
+        with allure.step("Проверить переход по логотипу Самоката"):
+            main_page.click_scooter_logo()
+            assert main_page.get_current_url == "https://qa-scooter.praktikum-services.ru/"
+
+        with allure.step("Проверить переход по логотипу Яндекса"):
+            main_page.click_yandex_logo()
+            assert "dzen.ru" in main_page.get_current_url
+
+
     @allure.title("Позитивный сценарий заказа - нижняя кнопка")
     @pytest.mark.parametrize(
         "entry_point,name,last_name,address,metro_station,phone,date,period,color,comment",
@@ -89,3 +98,12 @@ class TestOrderFlow:
 
         with allure.step("Проверить сообщение об успешном заказе"):
             assert "Заказ оформлен" in order_page.check_success_message()
+
+        with allure.step("Проверить переход по логотипу Самоката"):
+            main_page.click_scooter_logo()
+            assert main_page.get_current_url == "https://qa-scooter.praktikum-services.ru/"
+
+        with allure.step("Проверить переход по логотипу Яндекса"):
+            main_page.click_yandex_logo()
+            assert "dzen.ru" in main_page.get_current_url
+

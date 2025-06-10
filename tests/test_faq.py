@@ -32,7 +32,6 @@ class TestQuestions:
             questions_page.click_question(question_index)
             questions_page.click_question(question_index)
 
-
         with allure.step("Проверить текст ответа"):
             actual_answer = questions_page.get_answer_text(question_index)
             assert actual_answer == expected_answer, \

@@ -1,4 +1,3 @@
-# pages/questions_page.py
 from .base_page import BasePage
 from locators.faq_locators import QuestionsPageLocators
 import allure
@@ -25,6 +24,8 @@ class QuestionsPage(BasePage):
 
     @allure.step("Проверить ответ")
     def is_answer_displayed(self, question_index):
-        locator = (QuestionsPageLocators.ANSWER[0],
-                   QuestionsPageLocators.ANSWER[1].format(question_index))
-        return self.is_element_displayed
+        answer_locator = (By.XPATH, f"//div[@aria-labelledby='{question_index}']/p")
+        answer = self.is_answer_displayed(answer_locator)
+        self.wait.until(lambda d: answer.text.strip() != "")
+        return answer.text
+
