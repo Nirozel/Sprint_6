@@ -24,7 +24,7 @@ class QuestionsPage(BasePage):
 
     @allure.step("Проверить ответ")
     def is_answer_displayed(self, question_index):
-        answer_locator = (By.XPATH, f"//div[@aria-labelledby='{question_index}']/p")
+        answer_locator = QuestionsPageLocators.get_answer_locator(question_index)
         answer = self.is_answer_displayed(answer_locator)
         self.wait.until(lambda d: answer.text.strip() != "")
         return answer.text

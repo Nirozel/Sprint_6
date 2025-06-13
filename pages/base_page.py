@@ -52,3 +52,16 @@ class BasePage:
     @allure.step("Получить текущий URL")
     def get_current_url(self):
         return self.driver.current_url
+
+    @allure.step("Получить количество открытых окон")
+    def get_windows_count(self):
+        return len(self.driver.window_handles)
+
+    @allure.step("Переключиться на новое окно")
+    def switch_to_new_window(self, current_windows_count):
+        self.wait.until(lambda d: len(d.window_handles) > current_windows_count)
+        self.driver.switch_to.window(self.driver.window_handles[-1])
+
+    @allure.step("Ожидание URL содержащего '{url_fragment}'")
+    def wait_for_url_contains(self, url_fragment):
+        self.wait.until(lambda d: url_fragment in d.current_url.lower())
